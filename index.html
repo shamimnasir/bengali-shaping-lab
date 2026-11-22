@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A small browser lab for checking Bengali conjunct shaping, font fallback, and line wrapping across common system fonts.">
+  <title>Bengali Shaping Lab</title>
+  <style>
+    :root{color-scheme:light;--ink:#192321;--muted:#52615d;--line:#d6dfdb;--paper:#f5f7f4;--green:#076b55;--soft:#e2f2ec}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+    main{max-width:1080px;margin:auto;padding:32px 20px 64px}header{max-width:760px;margin-bottom:28px}h1{font-size:clamp(2rem,5vw,3.4rem);line-height:1.05;margin:0 0 14px;letter-spacing:-.04em}h2{font-size:1rem;margin:0 0 8px}p{color:var(--muted);margin:0 0 12px}.intro{font-size:1.1rem}.panel{background:white;border:1px solid var(--line);border-radius:16px;padding:18px;margin:16px 0}.toolbar{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end}label{display:block;font-weight:650;margin-bottom:6px}textarea,select{width:100%;font:inherit;border:1px solid #aab8b2;border-radius:10px;padding:10px;background:white;color:var(--ink)}textarea{min-height:132px;resize:vertical}button{font:inherit;font-weight:650;border:0;border-radius:10px;padding:11px 16px;background:var(--green);color:white;cursor:pointer;min-height:44px}button.secondary{background:var(--soft);color:var(--green);border:1px solid #acd5c6}.examples{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.examples button{font-size:.9rem;padding:7px 10px;min-height:38px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.sample{border:1px solid var(--line);border-radius:14px;background:white;padding:16px;min-width:0}.sample header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 0 12px;max-width:none}.sample h2{margin:0}.badge{font-size:.78rem;border-radius:999px;background:var(--soft);color:var(--green);padding:4px 9px;white-space:nowrap}.render{font-size:1.6rem;line-height:1.75;overflow-wrap:anywhere;min-height:92px;border-top:1px solid var(--line);padding-top:10px}.system{font-family:system-ui,"Noto Sans Bengali","Nirmala UI",sans-serif}.serif{font-family:Georgia,"Noto Serif Bengali","Nirmala UI",serif}.fallback{font-family:"Noto Sans Bengali","Nirmala UI","Bangla Sangam MN",sans-serif}.narrow{font-family:Arial,"Noto Sans Bengali","Nirmala UI",sans-serif;letter-spacing:.01em}.metrics{font-size:.85rem;color:var(--muted);margin-top:10px}.hint{font-size:.9rem}.status{min-height:1.4em;color:var(--green);font-size:.9rem}@media(max-width:700px){main{padding:22px 14px 44px}.grid{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr}.render{font-size:1.4rem}}
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Bengali Shaping Lab</h1>
+    <p class="intro">A tiny browser-based check for Bengali conjuncts, font fallback and line wrapping. It does not score fonts or replace real-device testing; it gives you the same text in four font stacks so you can spot differences.</p>
+    <p>Everything runs locally in this page. Your text is not uploaded.</p>
+  </header>
+  <section class="panel">
+    <label for="text">Text to compare</label>
+    <textarea id="text" lang="bn" spellcheck="false">বাংলা ভাষায় ওয়েবসাইট বানাই। ক্ষুদ্র ব্যবসা, শিক্ষা প্রতিষ্ঠান ও সবার জন্য প্রযুক্তি।</textarea>
+    <div class="examples" aria-label="Example text">
+      <button class="secondary" data-example="ক্ষ জ্ঞ ত্র শ্র স্ত্র">Conjuncts</button>
+      <button class="secondary" data-example="ক্ষুদ্র জ্ঞান ত্রিভুজ শ্রদ্ধা রাষ্ট্র">Words</button>
+      <button class="secondary" data-example="বাংলা ভাষায় ওয়েবসাইট বানাই। নিজের ব্যবসার জন্য সুন্দর একটি পৃষ্ঠা তৈরি করুন।">Wrapping</button>
+    </div>
+    <p class="hint">Tip: resize the window or each card to inspect wrapping. Installed fonts vary by device and operating system.</p>
+    <div class="status" role="status" aria-live="polite" id="status"></div>
+  </section>
+  <div class="grid" id="grid">
+    <article class="sample"><header><h2>System UI</h2><span class="badge">system fallback</span></header><div class="render system" lang="bn"></div><div class="metrics"></div></article>
+    <article class="sample"><header><h2>Serif first</h2><span class="badge">Georgia → Bengali fallback</span></header><div class="render serif" lang="bn"></div><div class="metrics"></div></article>
+    <article class="sample"><header><h2>Bengali sans first</h2><span class="badge">Noto Sans Bengali if installed</span></header><div class="render fallback" lang="bn"></div><div class="metrics"></div></article>
+    <article class="sample"><header><h2>Arial first</h2><span class="badge">mixed fallback</span></header><div class="render narrow" lang="bn"></div><div class="metrics"></div></article>
+  </div>
+  <section class="panel">
+    <h2>How to use it</h2>
+    <p>Try the same line on Android, Windows, macOS and a browser with a downloaded Bengali font. Check conjuncts, punctuation, numerals and narrow mobile widths. A browser cannot tell you whether a glyph is aesthetically correct; compare what you see with a fluent reader and the target device.</p>
+    <button id="copy" class="secondary">Copy this page's standalone HTML</button>
+  </section>
+</main>
+<script>
+  const field=document.querySelector('#text');
+  const cards=[...document.querySelectorAll('.sample')];
+  const status=document.querySelector('#status');
+  function draw(){for(const card of cards){const output=card.querySelector('.render');output.textContent=field.value||'বাংলা লেখা এখানে দেখা যাবে';const cs=getComputedStyle(output);card.querySelector('.metrics').textContent=`Loaded font: ${cs.fontFamily} · line height: ${cs.lineHeight} · ${output.clientWidth}px wide`}}
+  field.addEventListener('input',draw);
+  document.querySelectorAll('[data-example]').forEach(button=>button.addEventListener('click',()=>{field.value=button.dataset.example;draw();field.focus()}));
+  document.querySelector('#copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText('<!doctype html>\n'+document.documentElement.outerHTML);status.textContent='Standalone HTML copied.'}catch{status.textContent='Clipboard permission was blocked. Use your browser’s Save Page command instead.'}});
+  new ResizeObserver(draw).observe(document.querySelector('#grid'));
+  draw();
+</script>
+</body>
+</html>
